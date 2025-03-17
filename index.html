@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Constructeur de Graphe</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
+  <script src="index.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Constructeur de Graphe</h1>
+
+    <div class="controls">
+      <button id="example-btn">Charger exemple</button>
+      <button id="export-btn">Exporter</button>
+      <button id="reset-btn">Réinitialiser</button>
+    </div>
+
+    <div id="graph-container"></div>
+
+    <div class="output-section">
+      <h2>Données du graphe :</h2>
+      <pre id="graph-output">graph = {
+}</pre>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter un nœud -->
+  <div id="node-modal" class="modal">
+    <div class="modal-content">
+      <h3 id="node-operation">Ajouter un nœud</h3>
+      <div class="input-group">
+        <label for="node-id">ID du nœud :</label>
+        <input type="text" id="node-id" placeholder="Exemple: A, B, alfa, omega">
+      </div>
+      <div class="modal-buttons">
+        <button class="close-modal">Annuler</button>
+        <button id="node-saveButton" class="save-button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter une arête -->
+  <div id="edge-modal" class="modal">
+    <div class="modal-content">
+      <h3 id="edge-operation">Ajouter une arête</h3>
+      <div class="input-group">
+        <label for="edge-weight">Poids de l'arête :</label>
+        <input type="number" id="edge-weight" placeholder="Exemple: 45">
+      </div>
+      <div class="modal-buttons">
+        <button class="close-modal">Annuler</button>
+        <button id="edge-saveButton" class="save-button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
