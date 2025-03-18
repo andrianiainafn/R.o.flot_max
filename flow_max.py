@@ -30,7 +30,7 @@ def constructGraph(t, graph):
     graphe_maj = graph.copy()  # Copier le graphe pour éviter de modifier l'original
     premiere_cle, premiere_valeur = next(iter(t.items()))
 
-    for n in range(3):  # Boucler deux fois comme dans votre code original
+    for n in range(6):  # Boucler deux fois comme dans votre code original
         # Initialiser minim à la première valeur de la colonne n
         minim = premiere_valeur[n]
         if minim in ["S", "B"]:
@@ -95,11 +95,22 @@ def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs):
         # Si l'arc est bloqué, marquer toutes les colonnes restantes comme 'B'
         for i in range(index, len(t[a_verifier])):
             t[a_verifier][i] = 'B'
+        print("arc modifiers quand blocked", arcs_modifies)
         print("blocked-arcs", t[a_verifier])
+
+        # Pour tous les autres arcs, conserver la valeur précédente
+        for key, value in t.items():
+            if key != a_verifier:  # Pour tous les arcs sauf celui bloqué
+                # Ignorer les entrées déjà marquées comme 'S' ou 'B'
+                if index > 0 and (value[index - 1] == "S" or value[index - 1] == "B"):
+                    value[index] = value[index - 1]  # Conserver la même marque
+                else:
+                    value[index] = value[index - 1]  # Conserver la valeur précédente
     else:
         for key, value in t.items():
             # Ignorer les entrées déjà marquées comme 'S' ou 'B'
             if index > 0 and (value[index - 1] == "S" or value[index - 1] == "B"):
+                print("value: ", value)
                 value[index] = value[index - 1]  # Conserver la même marque
                 continue
 
