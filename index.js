@@ -178,6 +178,42 @@ document.addEventListener('DOMContentLoaded', function() {
       updateGraphOutput();
     }
   });
+  // Bouton pour envoyer le graphe par requête POST
+document.getElementById('send-btn').addEventListener('click', function() {
+  // URL où envoyer la requête
+  const url = 'link of or api'; // Remplacez par votre URL
+
+  // Préparation des données à envoyer
+  const graphData = {
+    graph: graph // Votre structure de graphe
+  };
+
+  // Configuration de la requête
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(graphData)
+  };
+
+  // Envoi de la requête
+  fetch(url, requestOptions)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Problème lors de l\'envoi des données');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert('Graphe envoyé avec succès!');
+      console.log('Réponse du serveur:', data);
+    })
+    .catch(error => {
+      alert('Erreur lors de l\'envoi du graphe: ' + error.message);
+      console.error('Erreur:', error);
+    });
+});
 
   // Bouton pour ajouter un exemple de graphe
   document.getElementById('example-btn').addEventListener('click', function() {
