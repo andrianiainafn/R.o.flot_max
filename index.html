@@ -10,13 +10,31 @@
   <script src="index.js" defer></script>
 </head>
 <body>
-  <div class="container">
+ <div class="container">
     <h1>Constructeur de Graphe</h1>
+
+    <!-- Nouvelle section pour l'entrée directe du graphe -->
+    <div class="graph-input-section">
+      <h2>Entrée directe du graphe :</h2>
+      <textarea id="graph-input" placeholder="Entrez votre graphe au format Python, exemple:
+graph = {
+    &quot;alfa&quot;: [(&quot;A&quot;, 45), (&quot;B&quot;, 25), (&quot;C&quot;, 30)],
+    &quot;A&quot;: [(&quot;D&quot;, 10), (&quot;E&quot;, 15), (&quot;G&quot;, 20)],
+    &quot;B&quot;: [(&quot;D&quot;, 20), (&quot;E&quot;, 5), (&quot;F&quot;, 15)],
+    &quot;C&quot;: [(&quot;F&quot;, 10), (&quot;G&quot;, 15)],
+    &quot;D&quot;: [(&quot;omega&quot;, 30)],
+    &quot;E&quot;: [(&quot;omega&quot;, 10)],
+    &quot;F&quot;: [(&quot;omega&quot;, 20)],
+    &quot;G&quot;: [(&quot;omega&quot;, 40)]
+}"></textarea>
+      <button id="parse-btn" class="action-btn">Analyser et générer le graphe</button>
+    </div>
 
     <div class="controls">
       <button id="example-btn">Charger exemple</button>
       <button id="export-btn">Exporter</button>
       <button id="reset-btn">Réinitialiser</button>
+      <button id="send-btn" class="action-btn">Envoyer le graphe</button>
     </div>
 
     <div id="graph-container"></div>
@@ -27,7 +45,7 @@
 }</pre>
     </div>
   </div>
-<button id="send-btn" class="action-btn">Envoyer le graphe</button>
+
   <!-- Modal pour ajouter un nœud -->
   <div id="node-modal" class="modal">
     <div class="modal-content">

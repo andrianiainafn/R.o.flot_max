@@ -29,8 +29,9 @@ def constructGraph(t, graph):
     """
     graphe_maj = graph.copy()  # Copier le graphe pour éviter de modifier l'original
     premiere_cle, premiere_valeur = next(iter(t.items()))
-
-    for n in range(6):  # Boucler deux fois comme dans votre code original
+    end = True
+    n=0
+    while end:  # Boucler deux fois comme dans votre code original
         # Initialiser minim à la première valeur de la colonne n
         minim = premiere_valeur[n]
         if minim in ["S", "B"]:
@@ -51,6 +52,8 @@ def constructGraph(t, graph):
         # Afficher l'état actuel du graphe et de la table
         print(f"Table après itération {n + 1}:", {k: v[:n + 2] for k, v in t.items()})
         print(f"Graphe après itération {n + 1}:", graphe_maj)
+        n=n+1
+        end = verifier_valeurs_non_terminales(t)
 
     return graphe_maj, t
 
@@ -67,6 +70,7 @@ def getMinimArc(t, n, startMinim):
     Returns:
         tuple: (arc, valeur minimale)
     """
+    print(startMinim)
     minim = startMinim if startMinim != 0 else float('inf')
     minim_key = ""
 
@@ -74,10 +78,9 @@ def getMinimArc(t, n, startMinim):
         # Ignorer les arcs marqués comme "S" ou "B"
         if n < len(value) and value[n] not in ["S", "B"] and isinstance(value[n], (int, float)):
             current_val = float(value[n])
-            if current_val < minim:
+            if current_val <= minim:
                 minim = current_val
                 minim_key = key
-
     if minim_key:
         arc = minim_key.split("-")
         return arc, minim
@@ -90,7 +93,9 @@ def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs):
     print("arc", a_verifier)
     blocked = check_if_blocked(a_verifier, t, graph)
     print("bloquer", blocked)
-
+    for key, value in t.items():
+        while len(value) <= index:
+            value.append(value[index -1 ])
     if blocked:
         # Si l'arc est bloqué, marquer toutes les colonnes restantes comme 'B'
         for i in range(index, len(t[a_verifier])):
@@ -103,9 +108,10 @@ def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs):
             if key != a_verifier:  # Pour tous les arcs sauf celui bloqué
                 # Ignorer les entrées déjà marquées comme 'S' ou 'B'
                 if index > 0 and (value[index - 1] == "S" or value[index - 1] == "B"):
-                    value[index] = value[index - 1]  # Conserver la même marque
+                    continue
                 else:
-                    value[index] = value[index - 1]  # Conserver la valeur précédente
+                    print("index, value", index,value)
+                    value[index] = value[index - 1]
     else:
         for key, value in t.items():
             # Ignorer les entrées déjà marquées comme 'S' ou 'B'
@@ -174,6 +180,31 @@ def check_if_blocked(arc_requis, table, graph):
 
     return tous_bloques
 
+
+def verifier_valeurs_non_terminales(table):
+    """
+    Vérifie s'il existe au moins un élément de la table qui n'a PAS une valeur 'B' ou 'S'
+    à son dernier index.
+
+    Args:
+        table (dict): Un dictionnaire où chaque valeur est une liste
+
+    Returns:
+        bool: True s'il existe au moins un élément qui NE se termine PAS par 'B' ou 'S',
+              False si tous les éléments se terminent par 'B' ou 'S'
+    """
+    for cle, liste in table.items():
+        # Vérifier si la liste est vide
+        if not liste:
+            return True  # Une liste vide ne se termine pas par 'B' ou 'S'
+
+        # Vérifier la dernière valeur
+        derniere_valeur = liste[-1]
+        if derniere_valeur != 'B' and derniere_valeur != 'S':
+            return True  # Trouvé un élément qui ne se termine pas par 'B' ou 'S'
+
+    # Si tous les éléments se terminent par 'B' ou 'S', retourner False
+    return False
 
 def mettre_a_jour_arc(graphe, depart, arrivee, valeur, table=None):
     """
