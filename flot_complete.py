@@ -1,4 +1,9 @@
 from collections import defaultdict, deque
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+from flow_max import firstStep, makeTable, constructGraph
+
 
 class Graph:
     def __init__(self, graph):
@@ -43,7 +48,7 @@ class Graph:
         # Step 2: Improve flow
         marked, parent = self.mark_nodes(source, sink)
         if sink not in marked:
-            return False  # No augmenting path
+            return False, None, 0  # No augmenting path
 
         # Find the augmenting path
         path = []
@@ -79,7 +84,21 @@ class Graph:
 
         print(f"Augmenting path: {path} with flow {min_residual}")
         self.print_flow()
-        return True
+        return True, path, min_residual
+
+    def get_flow_details(self):
+        """Retourne les détails du flot pour la réponse API"""
+        flow_details = {}
+        for u in self.graph:
+            flow_details[u] = {}
+            for v, capacity in self.graph[u]:
+                current_flow = self.flow[u].get(v, 0)
+                flow_details[u][v] = {
+                    'flow': current_flow,
+                    'capacity': capacity,
+                    'utilization': f"{current_flow}/{capacity}"
+                }
+        return flow_details
 
     def print_flow(self):
         print("Current Flow:")
@@ -89,35 +108,125 @@ class Graph:
         print()
 
     def ford_fulkerson(self, source, sink):
+        """Algorithme Ford-Fulkerson avec retour des détails pour l'API"""
+        iterations = []
+        iteration_count = 0
+
         print("Step 1: Marking Nodes and Improving Flow")
-        while self.improve_flow(source, sink):
-            pass
+        while True:
+            improved, path, flow_value = self.improve_flow(source, sink)
+
+            if not improved:
+                break
+
+            iteration_count += 1
+            iterations.append({
+                'iteration': iteration_count,
+                'augmenting_path': path,
+                'flow_value': flow_value
+            })
 
         print("Final Maximum Flow:")
         self.print_flow()
+
+        # Calculer le flot maximum
         max_flow = 0
         for v, _ in self.graph[source]:
             max_flow += self.flow[source][v]
-        return max_flow
 
-# Example graph
-graph = {
-    "alfa": [("A", 35), ("B", 25), ("C", 25)],
-    "A": [("D", 10), ("E", 5), ("G", 20)],
-    "B": [("D", 10), ("E", 5), ("F", 15)],
-    "C": [("F", 10), ("G", 15)],
-    "D": [("omega", 20)],
-    "E": [("omega", 10)],
-    "F": [("omega", 20)],
-    "G": [("omega", 35)],
-}
+        return {
+            'max_flow': max_flow,
+            'iterations': iterations,
+            'flow_details': self.get_flow_details()
+        }
 
-# Create the graph object
-g = Graph(graph)
 
-# Compute the maximum flow
-source = "alfa"
-sink = "omega"
-max_flow = g.ford_fulkerson(source, sink)
+# Création de l'application Flask
+app = Flask(__name__)
+CORS(app)
 
-print(f"\nThe maximum flow from {source} to {sink} is {max_flow}")
+
+def detecter_source_et_sink(graph):
+    """
+    Détecte automatiquement la source (pas d'arcs entrants) et le sink (pas d'arcs sortants)
+    """
+    tous_noeuds = set(graph.keys())
+    noeuds_avec_entrees = set()
+
+    # Trouver tous les nœuds qui ont des arcs entrants
+    for noeud in graph:
+        for voisin, _ in graph[noeud]:
+            noeuds_avec_entrees.add(voisin)
+            tous_noeuds.add(voisin)
+
+    # Source : nœud sans arcs entrants
+    sources_possibles = tous_noeuds - noeuds_avec_entrees
+
+    # Sink : nœud sans arcs sortants (pas dans les clés du graphe ou liste vide)
+    sinks_possibles = set()
+    for noeud in tous_noeuds:
+        if noeud not in graph or len(graph[noeud]) == 0:
+            sinks_possibles.add(noeud)
+
+    # Retourner la première source et le premier sink trouvés
+    source = list(sources_possibles)[0] if sources_possibles else None
+    sink = list(sinks_possibles)[0] if sinks_possibles else None
+
+    return source, sink
+
+
+@app.route('/flow-max', methods=['POST'])
+def flow_max():
+    try:
+        # Récupérer les données du graphe à partir du corps de la requête
+        data = request.json
+        if not data or 'graph' not in data:
+            return jsonify({'error': 'Le graphe est requis dans le corps de la requête'}), 400
+
+        graph = data['graph']
+
+        # Détection automatique si pas spécifié
+        if 'source' not in data or 'sink' not in data:
+            auto_source, auto_sink = detecter_source_et_sink(graph)
+            source = data.get('source', auto_source)
+            sink = data.get('sink', auto_sink)
+        else:
+            source = data['source']
+            sink = data['sink']
+
+        # Vérifier que source et sink sont valides
+        if source is None or sink is None:
+            return jsonify({'error': 'Impossible de détecter la source et/ou le sink automatiquement'}), 400
+
+        # Étapes existantes
+        init_graph = firstStep(graph)
+        table = makeTable(graph)
+        graph_maj, table_maj = constructGraph(table, init_graph)
+
+        # Nouvelle fonctionnalité : Calcul du flot maximum
+        # Créer l'objet Graph pour Ford-Fulkerson
+        ff_graph = Graph(graph)
+        ford_fulkerson_result = ff_graph.ford_fulkerson(source, sink)
+
+        # Préparer la réponse complète
+        response = {
+            'graph_final': graph_maj,
+            'table_finale': table_maj,
+            'ford_fulkerson': {
+                'source': source,
+                'sink': sink,
+                'max_flow': ford_fulkerson_result['max_flow'],
+                'iterations': ford_fulkerson_result['iterations'],
+                'flow_details': ford_fulkerson_result['flow_details'],
+                'total_iterations': len(ford_fulkerson_result['iterations'])
+            }
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
