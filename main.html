@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Constructeur de Graphe - Service RO</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+ <div class="container">
+    <h1>Constructeur de Graphe - Service RO</h1>
+
+    <!-- Nouvelle section pour l'entrée directe du graphe -->
+    <div class="graph-input-section">
+      <h2>Entrée directe du graphe :</h2>
+      <textarea id="graph-input" placeholder="Entrez votre graphe au format Python, exemple:
+graph = {
+    &quot;alfa&quot;: [(&quot;A&quot;, 45), (&quot;B&quot;, 25), (&quot;C&quot;, 30)],
+    &quot;A&quot;: [(&quot;D&quot;, 10), (&quot;E&quot;, 15), (&quot;G&quot;, 20)],
+    &quot;B&quot;: [(&quot;D&quot;, 20), (&quot;E&quot;, 5), (&quot;F&quot;, 15)],
+    &quot;C&quot;: [(&quot;F&quot;, 10), (&quot;G&quot;, 15)],
+    &quot;D&quot;: [(&quot;omega&quot;, 30)],
+    &quot;E&quot;: [(&quot;omega&quot;, 10)],
+    &quot;F&quot;: [(&quot;omega&quot;, 20)],
+    &quot;G&quot;: [(&quot;omega&quot;, 40)]
+}"></textarea>
+      <button id="parse-btn" class="action-btn">Analyser et générer le graphe</button>
+    </div>
+
+    <div class="controls">
+      <button id="example-btn">Charger exemple</button>
+      <button id="export-btn">Exporter</button>
+      <button id="reset-btn">Réinitialiser</button>
+      <button id="send-btn" class="action-btn">Calculer le flot maximum</button>
+    </div>
+
+    <div id="graph-container"></div>
+
+    <div class="output-section">
+      <h2>Données du graphe :</h2>
+      <pre id="graph-output">graph = {
+}</pre>
+    </div>
+
+    <!-- Section pour afficher les résultats du calcul -->
+    <div class="results-section" id="results-section" style="display: none;">
+      <h2>Résultats du calcul de flot maximum :</h2>
+      <div id="results-content"></div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter un nœud -->
+  <div id="node-modal" class="modal">
+    <div class="modal-content">
+      <h3 id="node-operation">Ajouter un nœud</h3>
+      <div class="input-group">
+        <label for="node-id">ID du nœud :</label>
+        <input type="text" id="node-id" placeholder="Exemple: A, B, alfa, omega">
+      </div>
+      <div class="modal-buttons">
+        <button class="close-modal">Annuler</button>
+        <button id="node-saveButton" class="save-button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter une arête -->
+  <div id="edge-modal" class="modal">
+    <div class="modal-content">
+      <h3 id="edge-operation">Ajouter une arête</h3>
+      <div class="input-group">
+        <label for="edge-weight">Poids de l'arête :</label>
+        <input type="number" id="edge-weight" placeholder="Exemple: 45">
+      </div>
+      <div class="modal-buttons">
+        <button class="close-modal">Annuler</button>
+        <button id="edge-saveButton" class="save-button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

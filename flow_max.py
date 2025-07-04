@@ -59,7 +59,7 @@ def constructGraph(t, graph):
     """
     # CHANGEMENT 1: Trouver automatiquement source et sink
     source, sink = find_source_and_sink(graph)
-    print(f"Source détectée: {source}, Sink détecté: {sink}")
+    # print(f"Source détectée: {source}, Sink détecté: {sink}")
 
     graphe_maj = graph.copy()
     premiere_cle, premiere_valeur = next(iter(t.items()))
@@ -75,18 +75,18 @@ def constructGraph(t, graph):
             minim = float(minim)
 
         arc, minim = getMinimArc(t, n, minim)
-        print(f"Itération {n + 1}, Arc sélectionné: {arc}, Valeur minimale: {minim}")
+        # print(f"Itération {n + 1}, Arc sélectionné: {arc}, Valeur minimale: {minim}")
 
         # CHANGEMENT 2: Passer source et sink à la fonction
         graphe_maj, arcs_modifies = mettre_a_jour_arc(graphe_maj, arc[0], arc[1], minim, t, source, sink)
-        print(f"Arcs modifiés: {arcs_modifies}")
+        # print(f"Arcs modifiés: {arcs_modifies}")
 
         # Mettre à jour la table avec les nouvelles valeurs
         t = mettre_a_jour_table(t, n + 1, minim, graphe_maj, arcs_modifies, arc, source, sink)
 
         # Afficher l'état actuel du graphe et de la table
-        print(f"Table après itération {n + 1}:", {k: v[:n + 2] for k, v in t.items()})
-        print(f"Graphe après itération {n + 1}:", graphe_maj)
+        # print(f"Table après itération {n + 1}:", {k: v[:n + 2] for k, v in t.items()})
+        # print(f"Graphe après itération {n + 1}:", graphe_maj)
         n = n + 1
         end = verifier_valeurs_non_terminales(t)
 
@@ -97,7 +97,7 @@ def getMinimArc(t, n, startMinim):
     """
     Trouve l'arc avec la valeur minimale dans la colonne n de la table.
     """
-    print(startMinim)
+    # print(startMinim)
     minim = startMinim if startMinim != 0 else float('inf')
     minim_key = ""
 
@@ -117,10 +117,10 @@ def getMinimArc(t, n, startMinim):
 
 def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs, source, sink):
     a_verifier = "-".join(arcs)
-    print("arc", a_verifier)
+    # print("arc", a_verifier)
     # CHANGEMENT 3: Passer source et sink
     blocked = check_if_blocked(a_verifier, t, graph, source, sink)
-    print("bloquer", blocked)
+    # print("bloquer", blocked)
 
     for key, value in t.items():
         while len(value) <= index:
@@ -130,8 +130,8 @@ def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs, source, sin
         # Si l'arc est bloqué, marquer toutes les colonnes restantes comme 'B'
         for i in range(index, len(t[a_verifier])):
             t[a_verifier][i] = 'B'
-        print("arc modifiers quand blocked", arcs_modifies)
-        print("blocked-arcs", t[a_verifier])
+        # print("arc modifiers quand blocked", arcs_modifies)
+        # print("blocked-arcs", t[a_verifier])
 
         # Pour tous les autres arcs, conserver la valeur précédente
         for key, value in t.items():
@@ -139,13 +139,13 @@ def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs, source, sin
                 if index > 0 and (value[index - 1] == "S" or value[index - 1] == "B"):
                     continue
                 else:
-                    print("index, value", index, value)
+                    # print("index, value", index, value)
                     value[index] = value[index - 1]
     else:
         for key, value in t.items():
             # Ignorer les entrées déjà marquées comme 'S' ou 'B'
             if index > 0 and (value[index - 1] == "S" or value[index - 1] == "B"):
-                print("value: ", value)
+                # print("value: ", value)
                 value[index] = value[index - 1]
                 continue
 
@@ -159,7 +159,7 @@ def mettre_a_jour_table(t, index, minim, graph, arcs_modifies, arcs, source, sin
                 if nouvelle_valeur == 0:
                     for i in range(index, len(value)):
                         value[i] = 'S'
-                    print(f"Arc {key} saturé: {value}")
+                    # print(f"Arc {key} saturé: {value}")
             else:
                 # Si l'arc n'est pas modifié, conserver la même valeur
                 value[index] = value[index - 1]
@@ -263,7 +263,7 @@ def mettre_a_jour_arc(graphe, depart, arrivee, valeur, table=None, source=None, 
 
     # CHANGEMENT 7: Passer source et sink
     chemin_plus_court = trouver_chemin_plus_court_avec_arc(graphe, arc_requis, source, sink)
-    print(f"Chemin le plus court pour {arc_requis}:", chemin_plus_court)
+    # print(f"Chemin le plus court pour {arc_requis}:", chemin_plus_court)
 
     chemins_a_utiliser = []
 
@@ -277,17 +277,17 @@ def mettre_a_jour_arc(graphe, depart, arrivee, valeur, table=None, source=None, 
                     for val in table[arc_key]:
                         if val in ["S", "B"]:
                             chemin_valide = False
-                            print(f"Chemin le plus court bloqué à l'arc {arc_key}")
+                            # print(f"Chemin le plus court bloqué à l'arc {arc_key}")
                             break
                 if not chemin_valide:
                     break
 
         if chemin_valide:
             chemins_a_utiliser.append(chemin_plus_court)
-            print(f"Utilisation du chemin le plus court: {chemin_plus_court}")
+            # print(f"Utilisation du chemin le plus court: {chemin_plus_court}")
         else:
             # Si le chemin le plus court est bloqué, récupérer tous les autres chemins valides
-            print("Chemin le plus court bloqué, recherche d'autres chemins...")
+            # print("Chemin le plus court bloqué, recherche d'autres chemins...")
             # CHANGEMENT 8: Passer source et sink
             tous_chemins = trouver_chemins_avec_arc(graphe, arc_requis, source, sink)
 
@@ -310,7 +310,7 @@ def mettre_a_jour_arc(graphe, depart, arrivee, valeur, table=None, source=None, 
                 if chemin_valide:
                     chemins_a_utiliser.append(chemin)
 
-    print(f"Chemins à utiliser pour {arc_requis}:", chemins_a_utiliser)
+    # print(f"Chemins à utiliser pour {arc_requis}:", chemins_a_utiliser)
 
     # Mettre à jour seulement les arcs des chemins sélectionnés
     for chemin in chemins_a_utiliser:
@@ -319,7 +319,7 @@ def mettre_a_jour_arc(graphe, depart, arrivee, valeur, table=None, source=None, 
                 for j, (dest, poids) in enumerate(graphe[source_arc]):
                     if dest == destination:
                         graphe[source_arc][j] = (dest, poids + valeur)
-                        print(f"Mise à jour de l'arc {source_arc}-{destination}: {poids} -> {poids + valeur}")
+                        # print(f"Mise à jour de l'arc {source_arc}-{destination}: {poids} -> {poids + valeur}")
                         break
 
     # Convertir en liste d'arcs modifiés
@@ -413,11 +413,46 @@ if __name__ == "__main__":
         "F": [("omega", 20)],
         "G": [("omega", 40)],
     }
-
+    graph_attendu = {
+        "A": [("B", 50), ("E", 25), ("D", 20)],
+        "B": [("C", 40), ("E", 10)],
+        "C": [("F", 20), ("I", 35)],
+        "D": [("G", 20)],
+        "E": [("D", 0), ("G", 10), ("H", 20), ("C", 15)],
+        "F": [("E", 10), ("H", 10), ("I", 5)],
+        "G": [("F", 5), ("H", 25)],
+        "H": [("J", 55)],
+        "I": [("H",0), ("J", 40)],
+    }
+    table_attendu = {
+        "A-B": [60, 55, 55, 45, 40, 40, 40, 40, 30, 30, 10, 'B'],
+        "A-D": [40, 40, 40, 40, 40, 35, 35, 35, 35, 20, 'B'],
+        "A-E": [25, 25, 15, 15, 15, 5, 0,  'S', 'S', 'S' ],
+        "B-C": [40, 35, 35, 25, 20, 20, 20, 20, 20, 20, 0, 'S'],
+        "B-E": [30, 30, 30, 30, 30, 30, 30, 30, 20, 20, 'B'],
+        "C-F": [20, 15, 15, 5, 0, 'S', 'S', 'S', 'S', 'S', 'S'],
+        "C-I": [50, 50, 50, 50, 50, 50, 50, 45, 35, 35, 15, 'B'],
+        "D-G": [20, 20, 20, 20, 20, 15, 15, 15, 15, 0, 'S'],
+        "E-C": [15, 15, 15, 15, 15, 15, 15, 10, 0, 'S','S'],
+        "E-D": [20, 20, 20, 20, 20, 20, 20, 20, 20, 'B'],
+        "E-G": [10, 10, 0, 'S', 'S', 'S', 'S','S', 'S', 'S', 'S'],
+        "E-H": [20, 20, 20, 10, 10, 10, 0, 'S', 'S', 'S', 'S'],
+        "F-E": [10, 10, 10, 0, 'S', 'S', 'S','S', 'S', 'S', 'S'],
+        "F-H": [10, 10, 10, 10, 5, 0 ,'S', 'S', 'S', 'S', 'S'],
+        "F-I": [5, 0, 'S', 'S', 'S', 'S','S', 'S', 'S', 'S', 'S'],
+        "G-F": [15, 15, 15, 15, 15, 10, 10, 10, 10, 'B', 'B'],
+        "G-H": [30, 30, 20, 20, 20, 20, 20, 20, 20, 5, 'B'],
+        "H-J": [55, 55, 45, 35, 30, 25, 15, 15, 15, 0, 'S'],
+        "I-H": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 'B'],
+        "I-J": [60, 55, 55, 55, 55, 55, 55, 55, 50, 40, 40, 20, 'B'],
+    }
     intiGraph = firstStep(graph)
     table = makeTable(graph)
     constructGraph(table, intiGraph)
-
+    graph_maj,t = constructGraph(table, intiGraph)
+    # print(t)
+    print("test test de test")
+    print(graph_maj)
 
     # def update_flow_graph(marked_path, flow, cap_back):
     #     capacite_dict = {(u, v): cap for (u, v, cap) in flow}
